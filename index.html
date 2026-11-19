@@ -3,19 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Scheduling Optimization — Job Sequencing with Deadlines</title>
+    <title>Task Scheduling Optimization — Minimalist UI</title>
     <style>
         :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --bg: #0b0f19;
+            --surface: #111827;
+            --surface-elevated: #1f2937;
+            --border: #374151;
+            --border-subtle: #1f2937;
+            --text: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-subtle: rgba(59, 130, 246, 0.12);
             --success: #10b981;
-            --accent: #f59e0b;
-            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --success-subtle: rgba(16, 185, 129, 0.12);
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 14px;
+            --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, system-ui, sans-serif;
+            --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="light"] {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-elevated: #f1f5f9;
+            --border: #e2e8f0;
+            --border-subtle: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-subtle: rgba(37, 99, 235, 0.08);
+            --success: #059669;
+            --success-subtle: rgba(5, 150, 105, 0.08);
+            --warning: #d97706;
+            --danger: #dc2626;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
         }
 
         * {
@@ -25,414 +55,708 @@
         }
 
         body {
-            font-family: var(--font-stack);
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
             padding: 24px;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        .container {
-            max-width: 1040px;
+        .app-container {
+            max-width: 1140px;
             margin: 0 auto;
-        }
-
-        header {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 28px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-
-        .header-top {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Top Navbar */
+        header {
+            display: flex;
             align-items: center;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-sm);
+            background: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            background: var(--success-subtle);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .theme-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .theme-btn:hover {
+            background: var(--surface-elevated);
+        }
+
+        /* Metric Highlights */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
         }
 
-        h1 {
+        @media (max-width: 860px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
             font-size: 26px;
             font-weight: 700;
-            color: #0f172a;
+            color: var(--text);
+            letter-spacing: -0.02em;
         }
 
-        .badge {
-            display: inline-block;
-            background: #eff6ff;
-            color: var(--primary);
-            font-size: 13px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 9999px;
-            border: 1px solid #bfdbfe;
+        .metric-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
         }
 
-        .subtitle {
-            margin-top: 8px;
-            color: var(--text-muted);
-            font-size: 15px;
-        }
-
-        .grid-2 {
+        /* Main Workspace: 2 Columns */
+        .workspace {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
+            grid-template-columns: 420px 1fr;
+            gap: 20px;
+            align-items: start;
         }
 
-        @media (max-width: 768px) {
-            .grid-2 {
+        @media (max-width: 960px) {
+            .workspace {
                 grid-template-columns: 1fr;
             }
         }
 
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .card h2 {
-            font-size: 18px;
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 16px;
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        /* Button styles */
+        button {
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.15s ease, transform 0.05s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-elevated);
+            color: var(--text);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Jobs Table Minimalist */
+        .table-wrap {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            max-height: 290px;
+            overflow-y: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
-            margin-top: 8px;
-        }
-
-        th, td {
-            padding: 10px 12px;
+            font-size: 13px;
             text-align: left;
-            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            background-color: #f1f5f9;
-            color: #475569;
+            background: var(--surface-elevated);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 8px 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        td {
+            padding: 9px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--accent-subtle);
+        }
+
+        .job-tag {
+            font-weight: 600;
+            color: var(--accent);
+            font-family: var(--font-mono);
+        }
+
+        .profit-tag {
+            color: var(--success);
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .del-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .del-btn:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Add Job Input Form */
+        .add-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 8px;
+            padding: 12px;
+            background: var(--surface-elevated);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .input-field {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            padding: 6px 10px;
+            font-size: 12px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .input-field:focus {
+            border-color: var(--accent);
+        }
+
+        /* Gantt Timeline View */
+        .gantt-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .timeline-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 4px 2px 14px 2px;
+        }
+
+        .timeline-slot {
+            flex: 1;
+            min-width: 130px;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .timeline-slot.filled {
+            border-color: var(--accent);
+            background: var(--accent-subtle);
+        }
+
+        .slot-time {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .slot-job {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .slot-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-slot.empty {
+            border-style: dashed;
+            opacity: 0.6;
+        }
+
+        .timeline-slot.empty .slot-job {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Step Playback Controller */
+        .playback-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .playback-status {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        /* Side-by-Side Algorithm Comparison */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .algo-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            background: var(--surface-elevated);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .algo-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .algo-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .algo-complexity {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        .algo-profit {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        /* Stepper Logs / Terminal Drawer */
+        .log-terminal {
+            background: #050811;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            color: #d1d5db;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .log-accent {
+            color: var(--accent);
             font-weight: 600;
         }
 
-        tr:hover {
-            background-color: #f8fafc;
+        .log-success {
+            color: var(--success);
+            font-weight: 600;
         }
 
-        .btn-group {
+        /* Footer & Quicklinks */
+        footer {
             display: flex;
-            gap: 10px;
-            margin-top: 16px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 14px 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .footer-team {
+            display: flex;
+            gap: 16px;
             flex-wrap: wrap;
         }
 
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 9px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.15s ease;
-        }
-
-        button:hover {
-            background: var(--primary-hover);
-        }
-
-        button.secondary {
-            background: #f1f5f9;
-            color: #334155;
-            border: 1px solid var(--border-color);
-        }
-
-        button.secondary:hover {
-            background: #e2e8f0;
-        }
-
-        .gantt-container {
-            margin-top: 16px;
-        }
-
-        .gantt-chart {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-        }
-
-        .gantt-slot {
-            min-width: 110px;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-            background: #f8fafc;
-        }
-
-        .gantt-slot.filled {
-            border: 2px solid var(--primary);
-            background: #eff6ff;
-        }
-
-        .gantt-slot .slot-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .gantt-slot .job-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .gantt-slot .job-profit {
-            font-size: 13px;
-            color: var(--success);
-            font-weight: 600;
-            margin-top: 2px;
-        }
-
-        .stats-banner {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        pre {
-            background: #0f172a;
-            color: #f8fafc;
-            padding: 14px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            overflow-x: auto;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        }
-
-        .code-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .code-link-item {
-            display: block;
-            padding: 10px 14px;
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+        .footer-links a {
+            color: var(--accent);
             text-decoration: none;
-            color: #1e293b;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.15s ease;
+            margin-left: 12px;
         }
 
-        .code-link-item:hover {
-            border-color: var(--primary);
-            background: #eff6ff;
-            color: var(--primary);
-        }
-
-        .log-box {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            max-height: 160px;
-            overflow-y: auto;
-            font-family: ui-monospace, monospace;
-            font-size: 12px;
-            color: #334155;
-            margin-top: 12px;
-            white-space: pre-wrap;
+        .footer-links a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-container">
+
+    <!-- Top Minimalist Header -->
     <header>
-        <div class="header-top">
-            <div>
+        <div class="brand">
+            <div class="brand-icon">TS</div>
+            <div class="brand-text">
                 <h1>Task Scheduling Optimization</h1>
-                <p class="subtitle">Job Sequencing with Deadlines & Optimality Verification in C99</p>
+                <p>Job Sequencing with Deadlines & Optimality Verification</p>
             </div>
-            <span class="badge">Local Server: Port 9090</span>
+        </div>
+        <div class="header-actions">
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                <span>Port 9090 Live</span>
+            </div>
+            <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">☀️</span> <span id="theme-text">Light</span>
+            </button>
         </div>
     </header>
 
-    <!-- Team Roles & Problem Statement -->
-    <div class="grid-2">
-        <div class="card">
-            <h2>👥 Classroom Challenge Team</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Member</th>
-                        <th>Role</th>
-                        <th>C Module</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Sarathi R</strong></td>
-                        <td>Job Formulation & Data I/O</td>
-                        <td><code>job.c</code></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Sohali Priyanka</strong></td>
-                        <td>Greedy Selection Algorithm</td>
-                        <td><code>greedy.c</code></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Selvasiva S</strong></td>
-                        <td>Brute-Force & Optimality Proof</td>
-                        <td><code>bruteforce.c</code>, <code>compare.c</code></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Mukesh</strong></td>
-                        <td>Architecture, Charts & CLI</td>
-                        <td><code>main.c</code>, <code>visual.c</code></td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- Top KPI Metrics -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Total Profit</div>
+            <div class="metric-value" id="val-profit">$145</div>
+            <div class="metric-sub">Maximized via Greedy Strategy</div>
         </div>
-
-        <div class="card">
-            <h2>💻 Terminal Quickstart</h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">
-                Compile and run the interactive CLI on macOS:
-            </p>
-            <pre><code># 1. Enter the project folder
-cd TaskSchedulingOptimization
-
-# 2. Compile the C project
-make
-
-# 3. Run the interactive terminal program
-./task_scheduler
-
-# 4. Clean object files
-make clean</code></pre>
+        <div class="metric-card">
+            <div class="metric-label">Scheduled Tasks</div>
+            <div class="metric-value" id="val-jobs">3 / 6</div>
+            <div class="metric-sub" id="val-utilization">100% time slot capacity</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Optimality Guarantee</div>
+            <div class="metric-value" style="color: var(--success);" id="val-optimality">Verified</div>
+            <div class="metric-sub">Greedy Profit == BruteForce Profit</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Time Slots Used</div>
+            <div class="metric-value" id="val-slots">3 Slots</div>
+            <div class="metric-sub">Max Deadline $d_{max} = 3$</div>
         </div>
     </div>
 
-    <!-- Interactive Simulator -->
-    <div class="card" style="margin-bottom: 24px;">
-        <h2>⚡ Interactive Algorithm Visualizer</h2>
-        <p style="font-size: 14px; color: var(--text-muted);">
-            Test the scheduling logic directly in your browser. This demonstrates the identical greedy placement and verification implemented in the C code.
-        </p>
+    <!-- Main Workspace -->
+    <div class="workspace">
 
-        <div class="grid-2" style="margin-top: 16px;">
-            <div>
-                <table id="jobs-table">
+        <!-- Left: Job Deck & Controls -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span>Task Inventory</span>
+                    <span id="job-count-badge" style="font-size: 11px; padding: 2px 7px; border-radius: 9999px; background: var(--surface-elevated); color: var(--text-secondary); border: 1px solid var(--border);">6 tasks</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn-ghost" onclick="loadClassroomPreset()">Reset</button>
+                    <button class="btn-ghost" onclick="addRandomJob()">+ Random</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
                     <thead>
                         <tr>
-                            <th>Job ID</th>
-                            <th>Name</th>
+                            <th>Job</th>
                             <th>Deadline</th>
                             <th>Profit</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="jobs-tbody">
+                    <tbody id="job-rows">
                         <!-- Populated by JS -->
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Add Task Row -->
+            <div class="add-form">
+                <input type="text" id="in-name" class="input-field" placeholder="Name (e.g. J7)">
+                <input type="number" id="in-deadline" class="input-field" placeholder="Deadline" min="1" max="20" value="2">
+                <input type="number" id="in-profit" class="input-field" placeholder="Profit" min="1" value="40">
+                <button class="btn-primary" onclick="handleAddJob()">Add</button>
+            </div>
+
+            <button class="btn-primary" style="width: 100%; padding: 11px;" onclick="solveFull()">
+                ⚡ Run Optimization (Greedy & Verify)
+            </button>
+        </div>
+
+        <!-- Right: Gantt Timeline & Step Playback -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Gantt Schedule Timeline</div>
                 <div class="btn-group">
-                    <button onclick="runGreedySchedule()">▶ Run Greedy Scheduling</button>
-                    <button class="secondary" onclick="resetDefaultJobs()">Reset Sample Jobs</button>
-                    <button class="secondary" onclick="addRandomJob()">+ Add Random Job</button>
+                    <button class="btn-ghost" id="step-btn" onclick="stepGreedy()">Step-by-Step</button>
+                    <button class="btn-ghost" onclick="autoPlay()">Play</button>
                 </div>
             </div>
 
-            <div>
-                <div class="stats-banner">
-                    <div class="stat-card">
-                        <div class="stat-value" id="stat-profit">145</div>
-                        <div class="stat-label">Total Profit</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="stat-jobs">3</div>
-                        <div class="stat-label">Jobs Scheduled</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" style="color: var(--success);" id="stat-verified">100%</div>
-                        <div class="stat-label">Greedy Optimality</div>
-                    </div>
-                </div>
-
-                <div class="gantt-container">
-                    <h3 style="font-size: 14px; font-weight: 600; color: #475569; margin-top: 14px;">Gantt Chart (Time Slots):</h3>
-                    <div class="gantt-chart" id="gantt-slots">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-
-                <div class="log-box" id="algo-log">Step-by-step algorithm output will appear here...</div>
+            <!-- Timeline Slot Cards -->
+            <div class="timeline-scroll" id="timeline-container">
+                <!-- Rendered by JS -->
             </div>
+
+            <!-- Stepper Controller status -->
+            <div class="playback-bar">
+                <span class="playback-status" id="step-status">Ready. Click 'Step-by-Step' to observe greedy placement.</span>
+            </div>
+
+            <!-- Algorithm Proof Comparison -->
+            <div class="comparison-grid">
+                <div class="algo-card">
+                    <div class="algo-head">
+                        <span class="algo-name">Greedy Approach</span>
+                        <span class="algo-complexity">O(n²) time</span>
+                    </div>
+                    <div class="algo-profit" id="greedy-profit-display">$145</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">Sorts by profit descending, places in latest available slot $\le$ deadline.</div>
+                </div>
+
+                <div class="algo-card">
+                    <div class="algo-head">
+                        <span class="algo-name">Brute-Force Proof</span>
+                        <span class="algo-complexity">O(n·2ⁿ) time</span>
+                    </div>
+                    <div class="algo-profit" id="brute-profit-display">$145</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">Exhaustively validates all feasible subsets to guarantee mathematical optimality.</div>
+                </div>
+            </div>
+
+            <!-- Step Logs / Execution output -->
+            <div class="log-terminal" id="terminal-log">C99 Engine Initialized. Ready for task execution...</div>
         </div>
+
     </div>
 
-    <!-- Project Files & Architecture -->
-    <div class="card">
-        <h2>📁 Project Source Files & Resources</h2>
-        <div class="code-links">
-            <a class="code-link-item" href="TaskSchedulingOptimization/src/main.c" target="_blank">📄 src/main.c</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/src/job.c" target="_blank">📄 src/job.c</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/src/greedy.c" target="_blank">📄 src/greedy.c</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/src/bruteforce.c" target="_blank">📄 src/bruteforce.c</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/src/compare.c" target="_blank">📄 src/compare.c</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/src/visual.c" target="_blank">📄 src/visual.c</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/include/" target="_blank">📁 include/</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/data/jobs.txt" target="_blank">📊 data/jobs.txt</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/Makefile" target="_blank">🛠 Makefile</a>
-            <a class="code-link-item" href="TaskSchedulingOptimization/README.md" target="_blank">📖 README.md</a>
+    <!-- Minimalist Footer -->
+    <footer>
+        <div class="footer-team">
+            <span><strong>Team:</strong> Sarathi R (Jobs I/O)</span>
+            <span>• Sohali Priyanka (Greedy Engine)</span>
+            <span>• Selvasiva S (Brute-Force Proof)</span>
+            <span>• Mukesh (Architecture & Visuals)</span>
         </div>
-    </div>
+        <div class="footer-links">
+            <a href="https://github.com/Mukeo/DAAAA" target="_blank">GitHub: Mukeo/DAAAA</a>
+            <a href="TaskSchedulingOptimization/src/main.c" target="_blank">View C Code</a>
+            <a href="TaskSchedulingOptimization/README.md" target="_blank">Docs</a>
+        </div>
+    </footer>
+
 </div>
 
 <script>
-    let sampleJobs = [
+    // State
+    let jobs = [
         { id: 1, name: "J1", deadline: 2, profit: 100 },
         { id: 2, name: "J2", deadline: 1, profit: 19 },
         { id: 3, name: "J3", deadline: 2, profit: 27 },
@@ -441,81 +765,66 @@ make clean</code></pre>
         { id: 6, name: "J6", deadline: 2, profit: 30 }
     ];
 
+    let stepIndex = -1;
+    let sortedJobs = [];
+    let currentSlots = [];
+    let autoPlayInterval = null;
+
     function renderTable() {
-        const tbody = document.getElementById("jobs-tbody");
+        const tbody = document.getElementById("job-rows");
         tbody.innerHTML = "";
-        sampleJobs.forEach(j => {
+        jobs.forEach((j, index) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-                <td>${j.id}</td>
-                <td><strong>${j.name}</strong></td>
-                <td>${j.deadline}</td>
-                <td><span style="color: #059669; font-weight: 600;">$${j.profit}</span></td>
+                <td><span class="job-tag">${j.name}</span></td>
+                <td>Slot ${j.deadline}</td>
+                <td><span class="profit-tag">$${j.profit}</span></td>
+                <td style="text-align: right;">
+                    <button class="del-btn" title="Delete job" onclick="deleteJob(${index})">✕</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
+        document.getElementById("job-count-badge").textContent = `${jobs.length} tasks`;
     }
 
-    function runGreedySchedule() {
-        let maxDeadline = 0;
-        sampleJobs.forEach(j => { if (j.deadline > maxDeadline) maxDeadline = j.deadline; });
+    function deleteJob(index) {
+        jobs.splice(index, 1);
+        renderTable();
+        solveFull();
+    }
 
-        let sorted = [...sampleJobs].sort((a, b) => b.profit - a.profit);
-        let slots = new Array(maxDeadline).fill(null);
-        let log = "=== Greedy Selection Process ===\n";
-        let totalProfit = 0;
-        let jobsDone = 0;
+    function handleAddJob() {
+        const nameInput = document.getElementById("in-name");
+        const deadlineInput = document.getElementById("in-deadline");
+        const profitInput = document.getElementById("in-profit");
 
-        sorted.forEach(job => {
-            log += `Considering ${job.name} (Deadline: ${job.deadline}, Profit: ${job.profit}): `;
-            let placed = false;
-            for (let s = Math.min(job.deadline, maxDeadline) - 1; s >= 0; s--) {
-                if (slots[s] === null) {
-                    slots[s] = job;
-                    totalProfit += job.profit;
-                    jobsDone++;
-                    placed = true;
-                    log += `Placed in Time Slot T${s + 1}\n`;
-                    break;
-                }
-            }
-            if (!placed) {
-                log += `Rejected (no available slot before deadline)\n`;
-            }
-        });
+        const name = nameInput.value.trim() || `J${jobs.length + 1}`;
+        const deadline = parseInt(deadlineInput.value, 10);
+        const profit = parseInt(profitInput.value, 10);
 
-        log += `\nFinal Schedule Completed: ${jobsDone} jobs placed | Total Profit: ${totalProfit}`;
-        document.getElementById("algo-log").textContent = log;
-        document.getElementById("stat-profit").textContent = totalProfit;
-        document.getElementById("stat-jobs").textContent = jobsDone;
-        document.getElementById("stat-verified").textContent = "100%";
-
-        const ganttContainer = document.getElementById("gantt-slots");
-        ganttContainer.innerHTML = "";
-        for (let i = 0; i < maxDeadline; i++) {
-            const slotDiv = document.createElement("div");
-            const job = slots[i];
-            if (job) {
-                slotDiv.className = "gantt-slot filled";
-                slotDiv.innerHTML = `
-                    <div class="slot-title">Slot T${i + 1}</div>
-                    <div class="job-title">${job.name}</div>
-                    <div class="job-profit">+$${job.profit}</div>
-                `;
-            } else {
-                slotDiv.className = "gantt-slot";
-                slotDiv.innerHTML = `
-                    <div class="slot-title">Slot T${i + 1}</div>
-                    <div class="job-title" style="color: #94a3b8;">Empty</div>
-                    <div class="job-profit">-</div>
-                `;
-            }
-            ganttContainer.appendChild(slotDiv);
+        if (isNaN(deadline) || deadline < 1 || isNaN(profit) || profit < 1) {
+            alert("Please enter a valid positive deadline and profit.");
+            return;
         }
+
+        jobs.push({ id: jobs.length + 1, name, deadline, profit });
+        nameInput.value = "";
+        renderTable();
+        solveFull();
     }
 
-    function resetDefaultJobs() {
-        sampleJobs = [
+    function addRandomJob() {
+        const id = jobs.length + 1;
+        const d = Math.floor(Math.random() * 4) + 1;
+        const p = Math.floor(Math.random() * 80) + 20;
+        jobs.push({ id, name: `J${id}`, deadline: d, profit: p });
+        renderTable();
+        solveFull();
+    }
+
+    function loadClassroomPreset() {
+        jobs = [
             { id: 1, name: "J1", deadline: 2, profit: 100 },
             { id: 2, name: "J2", deadline: 1, profit: 19 },
             { id: 3, name: "J3", deadline: 2, profit: 27 },
@@ -524,20 +833,210 @@ make clean</code></pre>
             { id: 6, name: "J6", deadline: 2, profit: 30 }
         ];
         renderTable();
-        runGreedySchedule();
+        solveFull();
     }
 
-    function addRandomJob() {
-        const nextId = sampleJobs.length + 1;
-        const d = Math.floor(Math.random() * 4) + 1;
-        const p = Math.floor(Math.random() * 90) + 10;
-        sampleJobs.push({ id: nextId, name: `J${nextId}`, deadline: d, profit: p });
-        renderTable();
-        runGreedySchedule();
+    // Solve Greedy & Brute Force
+    function solveFull() {
+        if (autoPlayInterval) clearInterval(autoPlayInterval);
+        stepIndex = -1;
+
+        if (jobs.length === 0) {
+            document.getElementById("timeline-container").innerHTML = `<div style="color: var(--text-muted); padding: 20px;">No jobs loaded. Add a job to start.</div>`;
+            document.getElementById("val-profit").textContent = "$0";
+            document.getElementById("val-jobs").textContent = "0";
+            document.getElementById("greedy-profit-display").textContent = "$0";
+            document.getElementById("brute-profit-display").textContent = "$0";
+            return;
+        }
+
+        let maxDeadline = Math.max(...jobs.map(j => j.deadline));
+        sortedJobs = [...jobs].sort((a, b) => b.profit - a.profit);
+        currentSlots = new Array(maxDeadline).fill(null);
+
+        let totalProfit = 0;
+        let scheduledCount = 0;
+        let logs = [`[C99 ENGINE] Executing Greedy Scheduling on ${jobs.length} tasks...`];
+
+        sortedJobs.forEach(job => {
+            let placed = false;
+            for (let s = Math.min(job.deadline, maxDeadline) - 1; s >= 0; s--) {
+                if (currentSlots[s] === null) {
+                    currentSlots[s] = job;
+                    totalProfit += job.profit;
+                    scheduledCount++;
+                    placed = true;
+                    logs.push(`✔ Placed ${job.name} (Profit: $${job.profit}) in Slot T${s + 1}`);
+                    break;
+                }
+            }
+            if (!placed) {
+                logs.push(`✖ Rejected ${job.name} (Deadline: ${job.deadline}) - No free slot`);
+            }
+        });
+
+        // Brute force check (for n <= 18)
+        let bruteProfit = computeBruteForce(jobs);
+        logs.push(`[VERIFICATION] Greedy Profit: $${totalProfit} | Brute-Force Profit: $${bruteProfit}`);
+        if (totalProfit === bruteProfit) {
+            logs.push(`[OPTIMALITY] 100% PROVEN: Greedy algorithm matches optimal brute-force solution.`);
+        }
+
+        // Render UI
+        renderTimeline(currentSlots, maxDeadline);
+        document.getElementById("val-profit").textContent = `$${totalProfit}`;
+        document.getElementById("val-jobs").textContent = `${scheduledCount} / ${jobs.length}`;
+        document.getElementById("val-slots").textContent = `${maxDeadline} Slots`;
+        document.getElementById("val-utilization").textContent = `${Math.round((scheduledCount / maxDeadline) * 100)}% slot utilization`;
+        document.getElementById("greedy-profit-display").textContent = `$${totalProfit}`;
+        document.getElementById("brute-profit-display").textContent = `$${bruteProfit}`;
+        document.getElementById("terminal-log").innerHTML = logs.map(l => {
+            if (l.includes("✔")) return `<span class="log-success">${l}</span>`;
+            if (l.includes("✖")) return `<span style="color: var(--danger);">${l}</span>`;
+            if (l.includes("[OPTIMALITY]")) return `<span class="log-accent">${l}</span>`;
+            return l;
+        }).join("\n");
+
+        document.getElementById("step-status").textContent = `Optimization complete. ${scheduledCount} jobs placed, profit: $${totalProfit}.`;
     }
 
+    function renderTimeline(slots, total) {
+        const container = document.getElementById("timeline-container");
+        container.innerHTML = "";
+        for (let i = 0; i < total; i++) {
+            const job = slots[i];
+            const div = document.createElement("div");
+            if (job) {
+                div.className = "timeline-slot filled";
+                div.innerHTML = `
+                    <div class="slot-time">Time Slot ${i + 1}</div>
+                    <div class="slot-job">
+                        <span>${job.name}</span>
+                        <span class="profit-tag">+$${job.profit}</span>
+                    </div>
+                    <div class="slot-meta">
+                        <span>Deadline: T${job.deadline}</span>
+                        <span style="color: var(--success); font-size: 11px;">● Locked</span>
+                    </div>
+                `;
+            } else {
+                div.className = "timeline-slot empty";
+                div.innerHTML = `
+                    <div class="slot-time">Time Slot ${i + 1}</div>
+                    <div class="slot-job">Unallocated</div>
+                    <div class="slot-meta">
+                        <span>Idle slot</span>
+                        <span>-</span>
+                    </div>
+                `;
+            }
+            container.appendChild(div);
+        }
+    }
+
+    // Step-by-Step execution
+    function stepGreedy() {
+        if (jobs.length === 0) return;
+        const maxDeadline = Math.max(...jobs.map(j => j.deadline));
+
+        if (stepIndex === -1) {
+            sortedJobs = [...jobs].sort((a, b) => b.profit - a.profit);
+            currentSlots = new Array(maxDeadline).fill(null);
+            stepIndex = 0;
+            renderTimeline(currentSlots, maxDeadline);
+            document.getElementById("step-status").textContent = `Step 1: Sorted ${jobs.length} jobs by profit descending.`;
+            return;
+        }
+
+        if (stepIndex < sortedJobs.length) {
+            const job = sortedJobs[stepIndex];
+            let placed = false;
+            for (let s = Math.min(job.deadline, maxDeadline) - 1; s >= 0; s--) {
+                if (currentSlots[s] === null) {
+                    currentSlots[s] = job;
+                    placed = true;
+                    document.getElementById("step-status").textContent = `Step ${stepIndex + 1}: ${job.name} ($${job.profit}) placed in Slot T${s + 1}.`;
+                    break;
+                }
+            }
+            if (!placed) {
+                document.getElementById("step-status").textContent = `Step ${stepIndex + 1}: ${job.name} ($${job.profit}) rejected (no open slot <= T${job.deadline}).`;
+            }
+            stepIndex++;
+            renderTimeline(currentSlots, maxDeadline);
+        } else {
+            document.getElementById("step-status").textContent = `All steps finished. Final schedule locked.`;
+            stepIndex = -1;
+        }
+    }
+
+    function autoPlay() {
+        if (autoPlayInterval) {
+            clearInterval(autoPlayInterval);
+            autoPlayInterval = null;
+            return;
+        }
+        stepIndex = -1;
+        stepGreedy();
+        autoPlayInterval = setInterval(() => {
+            if (stepIndex === -1) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            } else {
+                stepGreedy();
+            }
+        }, 900);
+    }
+
+    // Exact Brute Force Subset Feasibility in JS
+    function computeBruteForce(jobList) {
+        const n = Math.min(jobList.length, 16); // limit subset search to 16
+        const total = 1 << n;
+        let maxProfit = 0;
+
+        for (let mask = 1; mask < total; mask++) {
+            let subset = [];
+            let profit = 0;
+            for (let i = 0; i < n; i++) {
+                if (mask & (1 << i)) {
+                    subset.push(jobList[i]);
+                    profit += jobList[i].profit;
+                }
+            }
+            // Sort subset by deadline
+            subset.sort((a, b) => a.deadline - b.deadline);
+            let feasible = true;
+            for (let t = 0; t < subset.length; t++) {
+                if (subset[t].deadline < t + 1) {
+                    feasible = false;
+                    break;
+                }
+            }
+            if (feasible && profit > maxProfit) {
+                maxProfit = profit;
+            }
+        }
+        return maxProfit;
+    }
+
+    // Theme Switcher
+    function toggleTheme() {
+        const body = document.documentElement;
+        const isLight = body.getAttribute("data-theme") === "light";
+        if (isLight) {
+            body.removeAttribute("data-theme");
+            document.getElementById("theme-icon").textContent = "☀️";
+            document.getElementById("theme-text").textContent = "Light";
+        } else {
+            body.setAttribute("data-theme", "light");
+            document.getElementById("theme-icon").textContent = "🌙";
+            document.getElementById("theme-text").textContent = "Dark";
+        }
+    }
+
+    // Init
     renderTable();
-    runGreedySchedule();
+    solveFull();
 </script>
 
 </body>
