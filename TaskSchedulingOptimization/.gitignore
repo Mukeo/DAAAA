@@ -1,3 +1,10 @@
+# Compiled binaries
+*.exe
 *.o
 task_scheduler
+
+# macOS
 .DS_Store
+
+# Output
+output/

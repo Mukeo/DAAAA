@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Scheduling Optimization</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='2' fill='%231B1A17'/><rect x='4' y='8' width='6' height='16' rx='1' fill='%23D9401F'/><rect x='13' y='12' width='6' height='12' rx='1' fill='%23F4F0E6' opacity='.6'/><rect x='22' y='5' width='6' height='19' rx='1' fill='%23F4F0E6' opacity='.35'/></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── Top Bar ──────────────────────────────────────────────────── -->
+<header class="topbar" role="banner">
+  <div class="topbar-inner">
+    <span class="topbar-title">Task Scheduling Optimization</span>
+    <nav aria-label="Page sections">
+      <ul class="topbar-nav">
+        <li><a href="#s01">01 Jobs</a></li>
+        <li><a href="#s02">02 Greedy</a></li>
+        <li><a href="#s03">03 Timetable</a></li>
+        <li><a href="#s04">04 Verification</a></li>
+        <li><a href="#s05">05 Performance</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ── Page intro ──────────────────────────────────────────────── -->
+<div class="container" style="padding-top:3rem;padding-bottom:1rem;border-bottom:1px solid var(--hairline);">
+  <h1>Task Scheduling Optimization</h1>
+  <p class="section-desc" style="margin-top:.5rem;font-size:1rem;">
+    Job sequencing with deadlines, solved greedily and verified by brute force.
+  </p>
+</div>
+
+<!-- ── 01 Jobs ──────────────────────────────────────────────────── -->
+<section id="s01" class="section" aria-labelledby="jobs-title">
+  <div class="container">
+    <div class="section-label">01</div>
+    <h2 class="section-title" id="jobs-title">Jobs</h2>
+    <p class="section-desc">
+      Define up to 20 jobs. Each job has a deadline (time slot by which it must complete)
+      and a profit. The scheduler tries to maximise total profit.
+    </p>
+
+    <div class="btn-group" style="margin-bottom:1.5rem;">
+      <button class="btn btn-secondary" id="btn-load-sample">Load sample</button>
+      <button class="btn btn-secondary" id="btn-random">Random (8)</button>
+      <button class="btn btn-secondary btn-sm" id="btn-add-row">+ Add row</button>
+    </div>
+
+    <div id="jobs-error" class="inline-error"></div>
+
+    <div class="table-wrap">
+      <table id="jobs-table" aria-label="Jobs list">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col" style="text-align:right;">Deadline</th>
+            <th scope="col" style="text-align:right;">Profit</th>
+            <th scope="col"><span class="sr-only">Remove</span></th>
+          </tr>
+        </thead>
+        <tbody id="jobs-tbody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div id="jobs-empty" class="state-empty mt-6" style="display:none;">
+      No jobs yet. Load a sample or add rows above.
+    </div>
+
+    <div class="btn-group mt-6">
+      <button class="btn btn-primary" id="btn-run-greedy">Run Greedy</button>
+      <button class="btn btn-secondary" id="btn-run-compare">Run Verification</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── 02 Greedy ────────────────────────────────────────────────── -->
+<section id="s02" class="section" aria-labelledby="greedy-title">
+  <div class="container">
+    <div class="section-label">02</div>
+    <h2 class="section-title" id="greedy-title">Greedy Algorithm</h2>
+    <p class="section-desc">
+      Jobs are sorted by profit, highest first. Each job claims the latest free time slot
+      at or before its deadline. If no slot is available, the job is rejected.
+      This runs in O(n²) — fast but not guaranteed optimal.
+    </p>
+
+    <!-- Profit counter + step caption -->
+    <div style="display:flex;align-items:flex-start;gap:2rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+      <div>
+        <div class="player-counter" id="profit-counter" aria-live="polite" aria-atomic="true">0</div>
+        <div class="player-counter-label">profit so far</div>
+      </div>
+      <div style="flex:1;min-width:220px;">
+        <div class="player-caption" id="step-caption" aria-live="polite">
+          Run the greedy algorithm above to begin stepping through each decision.
+        </div>
+      </div>
+    </div>
+
+    <div class="player-controls" role="group" aria-label="Step player">
+      <button class="btn btn-secondary" id="btn-prev" aria-label="Previous step" disabled>&#8592; Prev</button>
+      <button class="btn btn-primary"   id="btn-play" aria-label="Play" disabled>Play</button>
+      <button class="btn btn-secondary" id="btn-next" aria-label="Next step" disabled>Next &#8594;</button>
+      <input type="range" id="step-scrubber" class="player-scrubber"
+             min="0" max="0" value="0" aria-label="Step position" disabled />
+      <span class="mono" id="step-counter" style="color:var(--muted);white-space:nowrap;">— / —</span>
+    </div>
+
+    <!-- Player timetable preview -->
+    <div id="player-timetable-wrap" class="timetable-wrap">
+      <div class="state-empty" id="player-tt-empty">Step through above to see placement.</div>
+      <div id="player-timetable" style="display:none;"></div>
+    </div>
+
+    <div id="greedy-error" class="inline-error mt-4"></div>
+  </div>
+</section>
+
+<!-- ── 03 Timetable ─────────────────────────────────────────────── -->
+<section id="s03" class="section" aria-labelledby="tt-title">
+  <div class="container">
+    <div class="section-label">03</div>
+    <h2 class="section-title" id="tt-title">Timetable</h2>
+    <p class="section-desc">
+      Final greedy schedule displayed as a timetable. Each column is a time slot.
+      Rejected jobs appear below, struck through.
+    </p>
+
+    <div id="timetable-container">
+      <div class="state-empty" id="tt-empty">Run the greedy algorithm to see the timetable.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 04 Verification ──────────────────────────────────────────── -->
+<section id="s04" class="section" aria-labelledby="verify-title">
+  <div class="container">
+    <div class="section-label">04</div>
+    <h2 class="section-title" id="verify-title">Verification</h2>
+    <p class="section-desc">
+      Brute force checks all 2ⁿ subsets to find the true optimal. If greedy profit
+      matches, the solution is proven optimal for this input.
+    </p>
+
+    <div id="verify-container">
+      <div class="state-empty" id="verify-empty">Run Verification above to compare algorithms.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 05 Performance ───────────────────────────────────────────── -->
+<section id="s05" class="section" aria-labelledby="perf-title">
+  <div class="container">
+    <div class="section-label">05</div>
+    <h2 class="section-title" id="perf-title">Performance</h2>
+    <p class="section-desc">
+      Execution time vs. number of jobs. Both axes on a log scale.
+    </p>
+
+    <div class="btn-group" style="margin-bottom:1.5rem;">
+      <button class="btn btn-secondary" id="btn-run-perf">Run Performance Analysis</button>
+    </div>
+
+    <div id="perf-container">
+      <div class="state-empty" id="perf-empty">Click above to run timings for n = 5, 8, 10, 12, 15, 18 jobs.</div>
+    </div>
+
+    <p class="chart-takeaway" id="perf-takeaway" style="display:none;">
+      Greedy runs in roughly O(n²), while brute force grows as O(2ⁿ) — exponential divergence becomes stark beyond n = 12.
+    </p>
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────────────────── -->
+<footer style="padding:2rem 0;border-top:1px solid var(--hairline);">
+  <div class="container" style="color:var(--muted);font-size:var(--ts-xs);font-family:var(--ff-mono);">
+    Task Scheduling Optimization &mdash; C99 backend &bull; Plain HTML/CSS/JS frontend
+  </div>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../include/job.h"
 #include "../include/greedy.h"
 #include "../include/bruteforce.h"
 #include "../include/compare.h"
 #include "../include/visual.h"
-
-#define MAX_JOBS 20
+#include "../include/server.h"
 
 void pause_for_enter(void) {
     printf("\n  Press Enter to continue...");
@@ -38,7 +38,15 @@ static void print_menu_header(int job_count) {
     printf("  Select an option [0-9]: ");
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
+    /* --serve flag: start the HTTP server instead of the console menu */
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--serve") == 0) {
+            server_start(9090);
+            return 0;
+        }
+    }
+
     Job jobs[MAX_JOBS];
     int job_count = 0;
     int choice;
@@ -52,29 +60,31 @@ int main(void) {
         switch (choice) {
             case 1:
                 if (load_jobs_from_file("data/jobs.txt", jobs, &job_count) == 0) {
-                    printf("\n  [✓] Successfully loaded %d jobs from data/jobs.txt\n", job_count);
+                    printf("\n  [OK] Successfully loaded %d jobs from data/jobs.txt\n", job_count);
                 } else {
-                    printf("\n  [✗] Failed to load data/jobs.txt\n");
+                    printf("\n  [!] Failed to load data/jobs.txt\n");
                 }
                 pause_for_enter();
                 break;
             case 2:
                 if (input_jobs_manually(jobs, &job_count) == 0) {
-                    printf("\n  [✓] Successfully stored %d manual jobs.\n", job_count);
+                    printf("\n  [OK] Successfully stored %d manual jobs.\n", job_count);
                 } else {
-                    printf("\n  [✗] Input cancelled or invalid.\n");
+                    printf("\n  [!] Input cancelled or invalid.\n");
                 }
                 pause_for_enter();
                 break;
             case 3:
                 printf("\n  Enter number of random jobs (1-%d): ", MAX_JOBS);
-                int n; scanf("%d", &n);
-                if (n < 1 || n > MAX_JOBS) {
-                    printf("  [✗] Invalid count.\n");
-                } else {
-                    generate_random_jobs(jobs, n);
-                    job_count = n;
-                    printf("  [✓] Generated %d random jobs.\n", n);
+                {
+                    int n; scanf("%d", &n);
+                    if (n < 1 || n > MAX_JOBS) {
+                        printf("  [!] Invalid count.\n");
+                    } else {
+                        generate_random_jobs(jobs, n);
+                        job_count = n;
+                        printf("  [OK] Generated %d random jobs.\n", n);
+                    }
                 }
                 pause_for_enter();
                 break;
