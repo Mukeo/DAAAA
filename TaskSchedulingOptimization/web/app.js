@@ -139,8 +139,10 @@ function resetPlayer() {
   document.getElementById('step-counter').textContent   = '— / —';
   document.getElementById('step-caption').textContent   = 'Run the greedy algorithm above to begin stepping through each decision.';
   document.getElementById('step-caption').className     = 'player-caption';
-  document.getElementById('player-timetable').style.display = 'none';
-  document.getElementById('player-tt-empty').style.display  = '';
+  const ptt = document.getElementById('player-timetable');
+  if (ptt) ptt.style.display = 'none';
+  const pte = document.getElementById('player-tt-empty');
+  if (pte) pte.style.display = '';
   document.getElementById('step-scrubber').value        = 0;
   document.getElementById('step-scrubber').max          = 0;
 }
@@ -194,8 +196,9 @@ function renderPlayerTimetable(upToStep) {
   let numSlots = data.num_slots || 1;
 
   const wrap = document.getElementById('player-timetable');
-  wrap.style.display = '';
-  document.getElementById('player-tt-empty').style.display = 'none';
+  if (wrap) wrap.style.display = '';
+  const pte = document.getElementById('player-tt-empty');
+  if (pte) pte.style.display = 'none';
 
   // Build slot state up to and including upToStep
   const slotMap = {}; // slot index (1-based) -> step
@@ -565,8 +568,40 @@ function renderPerfChart(data) {
   wrap.innerHTML = svg;
   container.appendChild(wrap);
 
-  document.getElementById('perf-takeaway').style.display = '';
-  document.getElementById('perf-empty').style.display    = 'none';
+  // Table summary of benchmark data
+  const tableWrap = document.createElement('div');
+  tableWrap.className = 'table-wrap mt-6';
+  tableWrap.innerHTML = `
+    <table aria-label="Performance benchmark timings">
+      <thead>
+        <tr>
+          <th scope="col">Jobs (n)</th>
+          <th scope="col" style="text-align:right;">Greedy Time</th>
+          <th scope="col" style="text-align:right;">Brute Force Time</th>
+          <th scope="col" style="text-align:right;">Speedup Factor</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(d => {
+          const ratio = (d.bruteforce_ms / Math.max(d.greedy_ms, 0.0001)).toFixed(1);
+          return `
+            <tr>
+              <td class="num" style="text-align:left;font-weight:500;">n = ${d.n}</td>
+              <td class="num">${d.greedy_ms < 0.01 ? (d.greedy_ms * 1000).toFixed(0) + ' µs' : d.greedy_ms.toFixed(3) + ' ms'}</td>
+              <td class="num" style="color:var(--vermilion);">${d.bruteforce_ms < 0.01 ? (d.bruteforce_ms * 1000).toFixed(0) + ' µs' : d.bruteforce_ms.toFixed(3) + ' ms'}</td>
+              <td class="num" style="font-weight:500;">${ratio}×</td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+  container.appendChild(tableWrap);
+
+  const takeaway = document.getElementById('perf-takeaway');
+  if (takeaway) takeaway.style.display = '';
+  const empty = document.getElementById('perf-empty');
+  if (empty) empty.style.display = 'none';
 }
 
 /* ------------------------------------------------------------------ */
