@@ -1,0 +1,3 @@
+*.o
+task_scheduler
+.DS_Store

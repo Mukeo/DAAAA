@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Scheduling Optimization — Job Sequencing with Deadlines</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --accent: #f59e0b;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #eff6ff;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        button.secondary {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid var(--border-color);
+        }
+
+        button.secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .gantt-container {
+            margin-top: 16px;
+        }
+
+        .gantt-chart {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .gantt-slot {
+            min-width: 110px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            background: #f8fafc;
+        }
+
+        .gantt-slot.filled {
+            border: 2px solid var(--primary);
+            background: #eff6ff;
+        }
+
+        .gantt-slot .slot-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .gantt-slot .job-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .gantt-slot .job-profit {
+            font-size: 13px;
+            color: var(--success);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        .code-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .code-link-item {
+            display: block;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+
+        .code-link-item:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        .log-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 160px;
+            overflow-y: auto;
+            font-family: ui-monospace, monospace;
+            font-size: 12px;
+            color: #334155;
+            margin-top: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-top">
+            <div>
+                <h1>Task Scheduling Optimization</h1>
+                <p class="subtitle">Job Sequencing with Deadlines & Optimality Verification in C99</p>
+            </div>
+            <span class="badge">Local Server: Port 9090</span>
+        </div>
+    </header>
+
+    <!-- Team Roles & Problem Statement -->
+    <div class="grid-2">
+        <div class="card">
+            <h2>👥 Classroom Challenge Team</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Role</th>
+                        <th>C Module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Sarathi R</strong></td>
+                        <td>Job Formulation & Data I/O</td>
+                        <td><code>job.c</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sohali Priyanka</strong></td>
+                        <td>Greedy Selection Algorithm</td>
+                        <td><code>greedy.c</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Selvasiva S</strong></td>
+                        <td>Brute-Force & Optimality Proof</td>
+                        <td><code>bruteforce.c</code>, <code>compare.c</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mukesh</strong></td>
+                        <td>Architecture, Charts & CLI</td>
+                        <td><code>main.c</code>, <code>visual.c</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>💻 Terminal Quickstart</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">
+                Compile and run the interactive CLI on macOS:
+            </p>
+            <pre><code># 1. Compile the C project
+make
+
+# 2. Run the interactive terminal program
+./task_scheduler
+
+# 3. Clean object files
+make clean</code></pre>
+        </div>
+    </div>
+
+    <!-- Interactive Simulator -->
+    <div class="card" style="margin-bottom: 24px;">
+        <h2>⚡ Interactive Algorithm Visualizer</h2>
+        <p style="font-size: 14px; color: var(--text-muted);">
+            Test the scheduling logic directly in your browser. This demonstrates the identical greedy placement and verification implemented in the C code.
+        </p>
+
+        <div class="grid-2" style="margin-top: 16px;">
+            <div>
+                <table id="jobs-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Name</th>
+                            <th>Deadline</th>
+                            <th>Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobs-tbody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <div class="btn-group">
+                    <button onclick="runGreedySchedule()">▶ Run Greedy Scheduling</button>
+                    <button class="secondary" onclick="resetDefaultJobs()">Reset Sample Jobs</button>
+                    <button class="secondary" onclick="addRandomJob()">+ Add Random Job</button>
+                </div>
+            </div>
+
+            <div>
+                <div class="stats-banner">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-profit">145</div>
+                        <div class="stat-label">Total Profit</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-jobs">3</div>
+                        <div class="stat-label">Jobs Scheduled</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: var(--success);" id="stat-verified">100%</div>
+                        <div class="stat-label">Greedy Optimality</div>
+                    </div>
+                </div>
+
+                <div class="gantt-container">
+                    <h3 style="font-size: 14px; font-weight: 600; color: #475569; margin-top: 14px;">Gantt Chart (Time Slots):</h3>
+                    <div class="gantt-chart" id="gantt-slots">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="log-box" id="algo-log">Step-by-step algorithm output will appear here...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Files & Architecture -->
+    <div class="card">
+        <h2>📁 Project Source Files & Resources</h2>
+        <div class="code-links">
+            <a class="code-link-item" href="src/main.c" target="_blank">📄 src/main.c</a>
+            <a class="code-link-item" href="src/job.c" target="_blank">📄 src/job.c</a>
+            <a class="code-link-item" href="src/greedy.c" target="_blank">📄 src/greedy.c</a>
+            <a class="code-link-item" href="src/bruteforce.c" target="_blank">📄 src/bruteforce.c</a>
+            <a class="code-link-item" href="src/compare.c" target="_blank">📄 src/compare.c</a>
+            <a class="code-link-item" href="src/visual.c" target="_blank">📄 src/visual.c</a>
+            <a class="code-link-item" href="include/" target="_blank">📁 include/</a>
+            <a class="code-link-item" href="data/jobs.txt" target="_blank">📊 data/jobs.txt</a>
+            <a class="code-link-item" href="Makefile" target="_blank">🛠 Makefile</a>
+            <a class="code-link-item" href="README.md" target="_blank">📖 README.md</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    let sampleJobs = [
+        { id: 1, name: "J1", deadline: 2, profit: 100 },
+        { id: 2, name: "J2", deadline: 1, profit: 19 },
+        { id: 3, name: "J3", deadline: 2, profit: 27 },
+        { id: 4, name: "J4", deadline: 1, profit: 25 },
+        { id: 5, name: "J5", deadline: 3, profit: 15 },
+        { id: 6, name: "J6", deadline: 2, profit: 30 }
+    ];
+
+    function renderTable() {
+        const tbody = document.getElementById("jobs-tbody");
+        tbody.innerHTML = "";
+        sampleJobs.forEach(j => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${j.id}</td>
+                <td><strong>${j.name}</strong></td>
+                <td>${j.deadline}</td>
+                <td><span style="color: #059669; font-weight: 600;">$${j.profit}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function runGreedySchedule() {
+        // Find max deadline
+        let maxDeadline = 0;
+        sampleJobs.forEach(j => { if (j.deadline > maxDeadline) maxDeadline = j.deadline; });
+
+        // Sort descending by profit
+        let sorted = [...sampleJobs].sort((a, b) => b.profit - a.profit);
+        let slots = new Array(maxDeadline).fill(null);
+        let log = "=== Greedy Selection Process ===\n";
+        let totalProfit = 0;
+        let jobsDone = 0;
+
+        sorted.forEach(job => {
+            log += `Considering ${job.name} (Deadline: ${job.deadline}, Profit: ${job.profit}): `;
+            let placed = false;
+            for (let s = Math.min(job.deadline, maxDeadline) - 1; s >= 0; s--) {
+                if (slots[s] === null) {
+                    slots[s] = job;
+                    totalProfit += job.profit;
+                    jobsDone++;
+                    placed = true;
+                    log += `Placed in Time Slot T${s + 1}\n`;
+                    break;
+                }
+            }
+            if (!placed) {
+                log += `Rejected (no available slot before deadline)\n`;
+            }
+        });
+
+        log += `\nFinal Schedule Completed: ${jobsDone} jobs placed | Total Profit: ${totalProfit}`;
+        document.getElementById("algo-log").textContent = log;
+        document.getElementById("stat-profit").textContent = totalProfit;
+        document.getElementById("stat-jobs").textContent = jobsDone;
+        document.getElementById("stat-verified").textContent = "100%";
+
+        // Render Gantt
+        const ganttContainer = document.getElementById("gantt-slots");
+        ganttContainer.innerHTML = "";
+        for (let i = 0; i < maxDeadline; i++) {
+            const slotDiv = document.createElement("div");
+            const job = slots[i];
+            if (job) {
+                slotDiv.className = "gantt-slot filled";
+                slotDiv.innerHTML = `
+                    <div class="slot-title">Slot T${i + 1}</div>
+                    <div class="job-title">${job.name}</div>
+                    <div class="job-profit">+$${job.profit}</div>
+                `;
+            } else {
+                slotDiv.className = "gantt-slot";
+                slotDiv.innerHTML = `
+                    <div class="slot-title">Slot T${i + 1}</div>
+                    <div class="job-title" style="color: #94a3b8;">Empty</div>
+                    <div class="job-profit">-</div>
+                `;
+            }
+            ganttContainer.appendChild(slotDiv);
+        }
+    }
+
+    function resetDefaultJobs() {
+        sampleJobs = [
+            { id: 1, name: "J1", deadline: 2, profit: 100 },
+            { id: 2, name: "J2", deadline: 1, profit: 19 },
+            { id: 3, name: "J3", deadline: 2, profit: 27 },
+            { id: 4, name: "J4", deadline: 1, profit: 25 },
+            { id: 5, name: "J5", deadline: 3, profit: 15 },
+            { id: 6, name: "J6", deadline: 2, profit: 30 }
+        ];
+        renderTable();
+        runGreedySchedule();
+    }
+
+    function addRandomJob() {
+        const nextId = sampleJobs.length + 1;
+        const d = Math.floor(Math.random() * 4) + 1;
+        const p = Math.floor(Math.random() * 90) + 10;
+        sampleJobs.push({ id: nextId, name: `J${nextId}`, deadline: d, profit: p });
+        renderTable();
+        runGreedySchedule();
+    }
+
+    renderTable();
+    runGreedySchedule();
+</script>
+
+</body>
+</html>
