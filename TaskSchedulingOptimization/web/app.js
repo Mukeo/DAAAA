@@ -356,7 +356,7 @@ function renderFinalTimetable(data, jobs, containerId) {
 /* ------------------------------------------------------------------ */
 function renderVerification(data, jobs) {
   const container = document.getElementById('verify-container');
-  container.innerHTML = '';
+  container.innerHTML = '';  // clears any previous result or state-empty div
 
   // Stamp
   const stampWrap = document.createElement('div');
@@ -629,7 +629,7 @@ document.getElementById('btn-run-greedy').addEventListener('click', async () => 
     // Also render final timetable in s03
     const container = document.getElementById('timetable-container');
     container.innerHTML = '';
-    document.getElementById('tt-empty').style.display = 'none';
+    // tt-empty is inside timetable-container, so it's already gone — no need to hide it
     renderFinalTimetable(data, jobs, 'timetable-container');
 
     // Scroll to s02
@@ -653,7 +653,7 @@ document.getElementById('btn-run-compare').addEventListener('click', async () =>
   try {
     const data = await API.post('/api/compare', jobs);
     renderVerification(data, jobs);
-    document.getElementById('verify-empty').style.display = 'none';
+    // verify-empty is inside verify-container, already cleared by renderVerification
     document.getElementById('s04').scrollIntoView({ behavior: 'smooth' });
   } catch (e) {
     container.innerHTML = `<div class="state-error">Error: ${escHtml(e.message)}</div>`;

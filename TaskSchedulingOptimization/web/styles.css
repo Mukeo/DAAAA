@@ -4,7 +4,7 @@
    ================================================================ */
 
 /* --- Fonts -------------------------------------------------------- */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Sedgwick+Ave+Display&family=Rock+Salt&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* --- Variables ---------------------------------------------------- */
 :root {
@@ -16,9 +16,10 @@
   --forest:     #2F6B4F;
   --paper-alt:  #EDE9DC;
 
-  --ff-head:  'Fraunces', Georgia, serif;
-  --ff-body:  'Instrument Sans', system-ui, sans-serif;
-  --ff-mono:  'JetBrains Mono', Consolas, 'Courier New', monospace;
+  --ff-head:    'Permanent Marker', 'Sedgwick Ave Display', 'Rock Salt', cursive, sans-serif;
+  --ff-marker:  'Permanent Marker', cursive, sans-serif;
+  --ff-body:    'Instrument Sans', system-ui, sans-serif;
+  --ff-mono:    'JetBrains Mono', Consolas, 'Courier New', monospace;
 
   --ts-xs:    0.75rem;   /* 12px */
   --ts-sm:    0.875rem;  /* 14px */
@@ -65,9 +66,10 @@ body {
 /* --- Typography --------------------------------------------------- */
 h1, h2, h3, h4 {
   font-family: var(--ff-head);
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 400;
+  line-height: 1.25;
   color: var(--ink);
+  letter-spacing: 0.02em;
 }
 h1 { font-size: var(--ts-2xl); }
 h2 { font-size: var(--ts-xl); }
@@ -114,7 +116,8 @@ code, .mono {
 .topbar-title {
   font-family: var(--ff-head);
   font-size: var(--ts-md);
-  font-weight: 600;
+  font-weight: 400;
+  letter-spacing: 0.04em;
   color: var(--paper);
   white-space: nowrap;
 }
@@ -449,8 +452,8 @@ td.id-cell {
   display: inline-block;
   padding: var(--sp-3) var(--sp-6);
   font-family: var(--ff-head);
-  font-size: var(--ts-lg);
-  font-weight: 700;
+  font-size: var(--ts-xl);
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border: 3px double currentColor;
